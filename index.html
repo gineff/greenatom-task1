@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="public/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+<!-- and it's easy to individually load additional languages -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+
+<script>hljs.highlightAll();</script>
+</head>
+<body>
+  <header>
+
+  </header>
+  <main>
+    <h1> 
+      <div>Домашнее задание 1</div>
+      <div> Развёртывание сервера, среды и платформы 1С-битрикс              </div>
+    </h1>
+    <h3>система Ubuntu Server 22.04</h3>
+
+    <article>
+        <p>Создаем каталог ~/my_web_pages и копируем в него файл bitrixsetup.php</p>
+        <pre>
+          <code  class="language-bash">
+            $ mkdir my_web_pages
+            $ cd ./my_web_pages
+            $ sudo wget https://www.1c-bitrix.ru/download/files/scripts/bitrixsetup.php
+          </code>
+        </pre>
+        <p>Настраиваем репозиторий для установки Docker</p>
+        <a href="https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository">
+          https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository
+        </a>
+      <pre>
+        <code  class="language-bash">
+          $ sudo apt-get update
+          $ sudo apt-get install ca-certificates curl gnupg
+        </code>
+      </pre>
+      <pre>
+        <code class="language-bash">
+          sudo install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          sudo chmod a+r /etc/apt/keyrings/docker.gpg
+        </code>
+      </pre>    
+      <pre>
+        <code class="language-bash">
+          echo \
+          "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        </code>
+      </pre>   
+      <pre>
+        <code class="language-bash">
+          sudo apt-get update
+        </code>
+      </pre>  
+      
+      <p>Устанавливаем Docker engine</p>
+      <a href="https://docs.docker.com/engine/install/ubuntu/#install-docker-engine">
+        https://docs.docker.com/engine/install/ubuntu/#install-docker-engine
+      </a>
+      <pre>
+        <code class="language-bash">
+          sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        </code>
+      </pre>  
+      <p>Загружаем образ с Docker Hub и запускаем контейнер</p>
+      <pre>
+        <code class="language-bash">
+          sudo docker run --name myXampp -p 41061:22 -p 41062:80 -d -v ~/my_web_pages:/www tomsik68/xampp:8
+        </code>
+      </pre>
+      <p style="font-size: 80%;">
+        docker run: команда используется для создания и запуска контейнера Docker. <br>
+        --name myXampp: флаг задает имя для контейнера.<br>
+        -p 41061:22: флаг устанавливает проброс портов между хостом и контейнером.
+          Перенаправляет порт 22 (SSH) с хоста на порт 41061 контейнера. <br>
+        -p 41062:80: флаг  устанавливает проброс портов, перенаправляя порт 80 (HTTP) с хоста на порт 41062 контейнера. <br>
+        -d: флаг указывает Docker запустить контейнер в фоновом режиме (демон). <br>
+        -v ~/my_web_pages:/www: флаг создает связь между локальной директорией ~/my_web_pages и директорией /www внутри контейнера. Позволяет размещать файлы в ~/my_web_pages на хосте и видеть их внутри контейнера XAMPP в директории /www.<br>
+        tomsik68/xampp:8: имя образа Docker.<br>
+      </p>    
+      <p>Подключаемся к контейнеру (password: root) <br>
+         переходим в каталог проекта<br>
+         меняем параметры short_open_tag и max_input_vars в etc/php.ini<br>
+        </p>
+      <pre>
+        <code class="language-bash">
+          ssh root@localhost -p 41061
+          root@fa2c81bbfde3 cd  /opt/lampp
+          root@fa2c81bbfde3:/opt/lampp nano etc/php.ini 
+          (short_open_tag=On; max_input_vars=10000)
+        </code>
+      </pre>
+      <p>Перезагружаем сервер      </p>
+      <pre>
+        <code class="language-bash">
+          sudo docker exec myXampp /opt/lampp/lampp restart
+        </code>
+      </pre>
+      <p>даем права на запись при установке bitrix</p>
+      <pre>
+        <code class="language-bash">
+          root@fa2c81bbfde3:/opt/lampp chmod -R 777 htdocs
+        </code>
+      </pre>    
+      <p>в браузере открываем http://localhost:41062/phpmyadmin и создаем базу данных</p>
+      <img src="public/phpmyadmin.png" />
+      <p>в браузере открываем http://localhost:41062/www/bitrixsetup.php и устанавливаем bitrix</p>
+      <img src="public/bitrixsetup.png" />
+    </article>
+  </main>
+</body>
+</html>

@@ -1,0 +1,28 @@
+body {
+  width: 1280px;
+  margin: 0;
+  padding: 0;
+  margin: 0 auto;
+}
+
+header {
+  
+  height: 100px;
+  width: 100%;
+
+  background-color: antiquewhite;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  padding: 50px ;
+}
+
+main article {
+  padding-top: 20px;
+}  
+
+pre {
+  margin: 0
+}
