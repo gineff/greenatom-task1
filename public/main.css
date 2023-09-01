@@ -26,3 +26,10 @@ main article {
 pre {
   margin: 0
 }
+
+
+@media (max-width: 768px) {
+  body {
+    width: 768px;
+  }
+}
